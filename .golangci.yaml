@@ -6,6 +6,9 @@ linters:
     - gomnd # deprecated
     - exhaustruct
     - gochecknoglobals
+    - wrapcheck
+    - testpackage
+    - depguard
 linters-settings:
   gofumpt:
     extra-rules: true
@@ -20,24 +23,3 @@ linters-settings:
       - err
       - tt
       - t
-  depguard:
-    rules:
-      main:
-        files:
-        - $all
-        - "!$test"
-        allow:
-        - $gostd
-        - github.com/samber/slog-multi
-        - github.com/rs/zerolog
-        - github.com/samber/slog-zerolog/v2
-        - github.com/oscarbc96/agbridge/pkg
-        deny:
-        - pkg: "github.com/pkg/errors"
-          desc: Should be replaced by standard lib errors package
-      test:
-        files:
-        - $test
-        allow:
-        - $gostd
-        - github.com/stretchr/testify

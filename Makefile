@@ -30,7 +30,7 @@ lint:
 
 test:
 	$(info ******************** running tests ********************)
-	gotestsum -- -coverprofile=cover.out ./...
+	@gotestsum --format testdox --format-hide-empty-pkg ./...
 
 snapshot:
 	$(info ******************** building bin: snapshot ********************)
