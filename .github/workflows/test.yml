@@ -15,8 +15,8 @@ jobs:
           go-version: stable
       - run: go run gotest.tools/gotestsum@latest --junitfile unit-tests.xml --format pkgname
         env:
-          - AWS_ACCESS_KEY_ID='default'
-          - AWS_SECRET_KEY='default'
+          AWS_ACCESS_KEY_ID: default
+          AWS_SECRET_KEY: default
       - uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86  # v2.4.0
         with:
           paths: "unit-tests.xml"
