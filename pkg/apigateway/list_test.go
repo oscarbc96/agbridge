@@ -1,58 +1,19 @@
 package apigateway
 
 import (
-	"context"
-	"log"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/oscarbc96/agbridge/internal/testutil"
 	"github.com/stretchr/testify/suite"
-	"github.com/testcontainers/testcontainers-go/modules/localstack"
 )
 
 type APIGatewayTestSuite struct {
-	suite.Suite
-
-	Ctx                 context.Context //nolint:containedctx
-	Config              *aws.Config
-	LocalStackContainer *localstack.LocalStackContainer
-}
-
-func (suite *APIGatewayTestSuite) SetupSuite() {
-	suite.Ctx = context.Background()
-
-	cfg, lsc, err := testutil.CreateLocalStackContainer(suite.Ctx)
-	if err != nil {
-		log.Fatalf("failed to set up LocalStack container: %v", err)
-	}
-
-	suite.Config = cfg
-	suite.LocalStackContainer = lsc
-}
-
-func (suite *APIGatewayTestSuite) TearDownSuite() {
-	if err := testutil.CleanupAPIGateways(*suite.Config); err != nil {
-		log.Printf("failed to clean up API gateways: %v", err)
-	}
-
-	if err := suite.LocalStackContainer.Terminate(suite.Ctx); err != nil {
-		log.Printf("failed to terminate LocalStack container: %v", err)
-	}
-
-	suite.Ctx.Done()
+	testutil.BaseTestSuite
 }
 
 func (suite *APIGatewayTestSuite) SetupTest() {
-	if _, err := testutil.CreateAPIGateway(*suite.Config, "test"); err != nil {
-		log.Fatalf("failed to create test API gateway: %v", err)
-	}
-}
-
-func (suite *APIGatewayTestSuite) TearDownTest() {
-	if err := testutil.CleanupAPIGateways(*suite.Config); err != nil {
-		log.Printf("failed to clean up API gateways after test: %v", err)
-	}
+	_, err := testutil.CreateAPIGateway(*suite.Config, "test")
+	suite.Require().NoError(err, "failed to create test API gateway")
 }
 
 func (suite *APIGatewayTestSuite) TestListAPIGateways() {
