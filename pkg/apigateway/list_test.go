@@ -2,7 +2,7 @@ package apigateway
 
 import (
 	"context"
-	"os"
+	"log"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -24,7 +24,7 @@ func (suite *APIGatewayTestSuite) SetupSuite() {
 
 	cfg, lsc, err := testutil.CreateLocalStackContainer(suite.Ctx)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("failed to set up LocalStack container: %v", err)
 	}
 
 	suite.Config = cfg
@@ -32,40 +32,36 @@ func (suite *APIGatewayTestSuite) SetupSuite() {
 }
 
 func (suite *APIGatewayTestSuite) TearDownSuite() {
-	err := testutil.CleanupAPIGateways(*suite.Config)
-	if err != nil {
-		os.Exit(1)
+	if err := testutil.CleanupAPIGateways(*suite.Config); err != nil {
+		log.Printf("failed to clean up API gateways: %v", err)
 	}
 
-	err = suite.LocalStackContainer.Terminate(suite.Ctx)
-	if err != nil {
-		os.Exit(1)
+	if err := suite.LocalStackContainer.Terminate(suite.Ctx); err != nil {
+		log.Printf("failed to terminate LocalStack container: %v", err)
 	}
 
 	suite.Ctx.Done()
 }
 
 func (suite *APIGatewayTestSuite) SetupTest() {
-	_, err := testutil.CreateAPIGateway(*suite.Config, "test")
-	if err != nil {
-		os.Exit(1)
+	if _, err := testutil.CreateAPIGateway(*suite.Config, "test"); err != nil {
+		log.Fatalf("failed to create test API gateway: %v", err)
 	}
 }
 
 func (suite *APIGatewayTestSuite) TearDownTest() {
-	err := testutil.CleanupAPIGateways(*suite.Config)
-	if err != nil {
-		os.Exit(1)
+	if err := testutil.CleanupAPIGateways(*suite.Config); err != nil {
+		log.Printf("failed to clean up API gateways after test: %v", err)
 	}
 }
 
 func (suite *APIGatewayTestSuite) TestListAPIGateways() {
-	apgws, err := ListAPIGateways(*suite.Config)
+	apigws, err := ListAPIGateways(*suite.Config)
 
-	suite.NoError(err) //nolint:testifylint
-	suite.Len(apgws, 1)
+	suite.Require().NoError(err, "expected no error listing API gateways")
+	suite.Len(apigws, 1, "expected exactly one API gateway")
 }
 
-func TestApiGatewayTestSuite(t *testing.T) { //nolint:paralleltest
+func TestAPIGatewayTestSuite(t *testing.T) { //nolint:paralleltest
 	suite.Run(t, new(APIGatewayTestSuite))
 }
