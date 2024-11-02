@@ -6,6 +6,12 @@ import (
 	"github.com/oscarbc96/agbridge/pkg/log"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	options, err := parseFlags()
 
@@ -16,7 +22,8 @@ func main() {
 	}
 
 	if options.Version {
-		fmt.Println("Application version 1.0.0")
+		fmt.Printf("%s, commit %s, built at %s\n", version, commit, date)
+
 		return
 	}
 
