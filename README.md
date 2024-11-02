@@ -45,7 +45,7 @@ Set a custom port for AGBridge to listen on:
 agbridge --listen-address=:9090
 ```
 
-## Installationq
+## Installation
 
 ### Option 1: Using Homebrew
 
