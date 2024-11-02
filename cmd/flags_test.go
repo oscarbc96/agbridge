@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/oscarbc96/agbridge/pkg/log"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -75,6 +74,8 @@ func TestParseFlags_ValidResourceID(t *testing.T) {
 	require.NoError(t, err, "Expected no error")
 	assert.Equal(t, "12345", opts.ResourceID, "Resource ID mismatch")
 	assert.Empty(t, opts.ProfileName, "Expected profile name to be empty")
+	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
 func TestParseFlags_ValidResourceIDAndProfileName(t *testing.T) {
@@ -86,6 +87,8 @@ func TestParseFlags_ValidResourceIDAndProfileName(t *testing.T) {
 	require.NoError(t, err, "Expected no error")
 	assert.Equal(t, "12345", opts.ResourceID, "Resource ID mismatch")
 	assert.Equal(t, "testprofile", opts.ProfileName, "Profile name mismatch")
+	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
 func TestParseFlags_NoFlags(t *testing.T) {
@@ -102,8 +105,9 @@ func TestParseFlags_NoFlags(t *testing.T) {
 	opts, err := parseFlags()
 
 	require.NoError(t, err, "Expected no error")
-	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Log level mismatch")
+	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
 	assert.Equal(t, "agbridge.yaml", opts.Config, "Config file mismatch")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
 func TestParseFlags_ValidConfig(t *testing.T) {
@@ -119,8 +123,9 @@ func TestParseFlags_ValidConfig(t *testing.T) {
 	opts, err := parseFlags()
 
 	require.NoError(t, err, "Expected no error")
-	assert.EqualValues(t, log.LevelInfo, opts.LogLevel, "Log level mismatch")
+	assert.EqualValues(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
 	assert.Equal(t, tmpFile.Name(), opts.Config, "Config file path mismatch")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
 func TestParseFlags_InvalidConfigFileNotExist(t *testing.T) {
@@ -162,6 +167,8 @@ func TestParseFlags_OnlyAgbridgeYmlExists(t *testing.T) {
 
 	require.NoError(t, err, "Expected no error when agbridge.yml exists")
 	assert.Equal(t, "agbridge.yml", opts.Config, "Config file path should default to agbridge.yml")
+	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
 func TestParseFlags_ValidLogLevel(t *testing.T) {
@@ -178,7 +185,8 @@ func TestParseFlags_ValidLogLevel(t *testing.T) {
 	opts, err := parseFlags()
 
 	require.NoError(t, err, "Expected no error")
-	assert.EqualValues(t, log.LevelDebug, opts.LogLevel, "Log level mismatch")
+	assert.EqualValues(t, log.LevelDebug, opts.LogLevel, "Default log level mismatch")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
 func TestParseFlags_InvalidLogLevel(t *testing.T) {
@@ -190,4 +198,38 @@ func TestParseFlags_InvalidLogLevel(t *testing.T) {
 
 	assert.Error(t, err, "Expected invalid log level error")
 	assert.EqualError(t, err, "invalid log level: must be one of debug, info, warn, error, fatal")
+}
+
+func TestParseFlags_ValidListenAddress(t *testing.T) {
+	resetFlags()
+
+	// Create a temporary default config file
+	file, err := os.Create("agbridge.yaml")
+	require.NoError(t, err)
+	file.Close()
+	defer os.Remove("agbridge.yaml")
+
+	os.Args = []string{"cmd", "--listen-address", ":9090"}
+
+	opts, err := parseFlags()
+	require.NoError(t, err, "Expected no error")
+	assert.Equal(t, ":9090", opts.ListenAddress, "Listen address mismatch")
+	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
+}
+
+func TestParseFlags_DefaultListenAddress(t *testing.T) {
+	resetFlags()
+
+	// Create a temporary default config file to avoid missing file error
+	file, err := os.Create("agbridge.yaml")
+	require.NoError(t, err)
+	file.Close()
+	defer os.Remove("agbridge.yaml")
+
+	os.Args = []string{"cmd"}
+
+	opts, err := parseFlags()
+	require.NoError(t, err, "Expected no error")
+	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
+	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
 }
