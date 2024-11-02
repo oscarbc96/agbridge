@@ -9,6 +9,7 @@ linters:
     - wrapcheck
     - testpackage
     - depguard
+    - err113
 linters-settings:
   gofumpt:
     extra-rules: true

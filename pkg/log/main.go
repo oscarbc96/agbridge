@@ -28,4 +28,6 @@ var (
 	Bool   = slog.Bool
 )
 
+type Level = slog.Level
+
 type Logger = slog.Logger
