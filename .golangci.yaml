@@ -5,14 +5,3 @@ linters:
 linters-settings:
   gofumpt:
     extra-rules: true
-  varnamelen:
-    check-receiver: true
-    check-return: true
-    check-type-param: true
-    ignore-type-assert-ok: true
-    ignore-map-index-ok: true
-    ignore-chan-recv-ok: true
-    ignore-names:
-      - err
-      - tt
-      - t
