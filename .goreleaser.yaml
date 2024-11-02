@@ -85,3 +85,14 @@ docker_signs:
       - "sign"
       - "${artifact}"
       - "--yes" # needed on cosign 2.0.0+
+
+brews:
+  - description: "agbridge CLI for forwarding requests to private API gateways in AWS."
+    homepage: "https://github.com/oscarbc96/agbridge"
+    repository:
+      owner: oscarbc96
+      name: agbridge
+      pull_request:
+        enabled: true
+    test: |
+      system "#{bin}/agbridge --version"

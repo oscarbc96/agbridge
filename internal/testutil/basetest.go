@@ -11,7 +11,7 @@ import (
 type BaseTestSuite struct {
 	suite.Suite
 
-	Ctx                 context.Context //nolint:containedctx
+	Ctx                 context.Context
 	Config              *aws.Config
 	LocalStackContainer *localstack.LocalStackContainer
 }

@@ -23,6 +23,6 @@ func (suite *APIGatewayTestSuite) TestListAPIGateways() {
 	suite.Len(apigws, 1, "expected exactly one API gateway")
 }
 
-func TestAPIGatewayTestSuite(t *testing.T) { //nolint:paralleltest
+func TestAPIGatewayTestSuite(t *testing.T) {
 	suite.Run(t, new(APIGatewayTestSuite))
 }
