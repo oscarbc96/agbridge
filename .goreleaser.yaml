@@ -89,6 +89,7 @@ docker_signs:
 brews:
   - description: "agbridge CLI for forwarding requests to private API gateways in AWS."
     homepage: "https://github.com/oscarbc96/agbridge"
+    directory: Formula
     repository:
       owner: oscarbc96
       name: agbridge
