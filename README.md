@@ -3,6 +3,7 @@
 ![Latest GitHub release](https://img.shields.io/github/release/oscarbc96/agbridge.svg)
 [![Tests](https://github.com/oscarbc96/agbridge/workflows/test/badge.svg)](https://github.com/oscarbc96/agbridge/actions?query=workflow%3A"test")
 [![golangci-lint](https://github.com/oscarbc96/agbridge/workflows/golangci-lint/badge.svg)](https://github.com/oscarbc96/agbridge/actions?query=workflow%3A"golangci-lint")
+[![Go Report Card](https://goreportcard.com/badge/github.com/oscarbc96/agbridge)](https://goreportcard.com/report/github.com/oscarbc96/agbridge)
 
 AGBridge is a command-line tool that acts as a proxy, forwarding requests to private API gateways running in AWS. It’s designed to handle API gateways that are not publicly accessible, allowing secure and efficient access to private resources. Ideal for debugging, testing, or integration scenarios, AGBridge prevents the need to expose sensitive resources while enabling smooth access.
 
