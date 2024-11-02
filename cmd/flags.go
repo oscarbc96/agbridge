@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 
 	"github.com/oscarbc96/agbridge/pkg/log"
@@ -73,6 +74,11 @@ func parseFlags() (*Flags, error) {
 		ResourceID:    *resourceID,
 		ListenAddress: *listenAddress,
 		LogLevel:      logLevel,
+	}
+
+	// Validate listen address format
+	if _, _, err := net.SplitHostPort(*listenAddress); err != nil {
+		return flags, fmt.Errorf("invalid listen address format")
 	}
 
 	// Check if a custom config file is specified and verify its existence

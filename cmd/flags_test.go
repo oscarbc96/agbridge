@@ -31,7 +31,7 @@ func TestParseFlags_IncompatibleFlagsConfigAndProfile(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected incompatible flags error")
+	require.Error(t, err, "Expected incompatible flags error")
 	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --resource-id")
 }
 
@@ -41,7 +41,7 @@ func TestParseFlags_IncompatibleFlagsConfigAndResourceID(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected incompatible flags error")
+	require.Error(t, err, "Expected incompatible flags error")
 	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --resource-id")
 }
 
@@ -51,7 +51,7 @@ func TestParseFlags_IncompatibleFlagsConfigResourceIDAndProfile(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected incompatible flags error")
+	require.Error(t, err, "Expected incompatible flags error")
 	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --resource-id")
 }
 
@@ -61,7 +61,7 @@ func TestParseFlags_IncompatibleFlagsProfile(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected incompatible flags error")
+	require.Error(t, err, "Expected incompatible flags error")
 	assert.EqualError(t, err, "--profile-name requires --resource-id to be specified")
 }
 
@@ -135,7 +135,7 @@ func TestParseFlags_InvalidConfigFileNotExist(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected error for nonexistent config file")
+	require.Error(t, err, "Expected error for nonexistent config file")
 	assert.EqualError(t, err, "config file does not exist")
 }
 
@@ -146,7 +146,7 @@ func TestParseFlags_NoDefaultConfigFiles(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected error when no default config files are present")
+	require.Error(t, err, "Expected error when no default config files are present")
 	assert.EqualError(t, err, "please provide --resource-id, --config, or ensure agbridge.yaml or agbridge.yml exists")
 }
 
@@ -196,7 +196,7 @@ func TestParseFlags_InvalidLogLevel(t *testing.T) {
 
 	_, err := parseFlags()
 
-	assert.Error(t, err, "Expected invalid log level error")
+	require.Error(t, err, "Expected invalid log level error")
 	assert.EqualError(t, err, "invalid log level: must be one of debug, info, warn, error, fatal")
 }
 
@@ -215,6 +215,17 @@ func TestParseFlags_ValidListenAddress(t *testing.T) {
 	require.NoError(t, err, "Expected no error")
 	assert.Equal(t, ":9090", opts.ListenAddress, "Listen address mismatch")
 	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
+}
+
+func TestParseFlags_InvalidListenAddress(t *testing.T) {
+	resetFlags()
+
+	os.Args = []string{"cmd", "--listen-address", "qwerty"}
+
+	_, err := parseFlags()
+
+	require.Error(t, err, "Expected invalid listen address error")
+	assert.EqualError(t, err, "invalid listen address format")
 }
 
 func TestParseFlags_DefaultListenAddress(t *testing.T) {

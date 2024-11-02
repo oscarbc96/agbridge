@@ -1,15 +1,7 @@
 linters:
-  enable-all: true
-  disable:
-    - execinquery # deprecated
-    - exportloopref # deprecated
-    - gomnd # deprecated
-    - exhaustruct
-    - gochecknoglobals
-    - wrapcheck
-    - testpackage
-    - depguard
-    - err113
+  enable:
+    - gofumpt
+    - testifylint
 linters-settings:
   gofumpt:
     extra-rules: true

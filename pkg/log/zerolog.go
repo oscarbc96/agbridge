@@ -10,7 +10,7 @@ import (
 )
 
 func newSlogZeroLogHandler(level slog.Level) slog.Handler {
-	slogzerolog.ErrorKeys = []string{errKey} //nolint:reassign
+	slogzerolog.ErrorKeys = []string{errKey}
 	slogzerolog.LogLevels = map[slog.Level]zerolog.Level{
 		LevelDebug: zerolog.DebugLevel,
 		LevelInfo:  zerolog.InfoLevel,
