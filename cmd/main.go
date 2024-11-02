@@ -13,6 +13,7 @@ var (
 )
 
 func main() {
+	setCustomUsage()
 	options, err := parseFlags()
 
 	log.Setup(options.LogLevel)
@@ -27,5 +28,5 @@ func main() {
 		return
 	}
 
-	log.Info("", log.String("resource-id", options.ResourceID), log.String("profile-name", options.ProfileName), log.String("config", options.Config))
+	log.Info("", log.String("resource-id", options.ResourceID), log.String("profile-name", options.ProfileName), log.String("config", options.Config), log.String("listen-address", options.ListenAddress))
 }
