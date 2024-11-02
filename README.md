@@ -45,9 +45,20 @@ Set a custom port for AGBridge to listen on:
 agbridge --listen-address=:9090
 ```
 
-## Installation
+## Installationq
 
-### Option 1: Download from Releases
+### Option 1: Using Homebrew
+
+1. Add the Homebrew tap:
+   ```bash
+    brew tap oscarbc96/agbridge git@github.com:oscarbc96/agbridge.git
+   ```
+2. Install:
+   ```bash
+   brew install agbridge
+   ```
+
+### Option 2: Download from Releases
 
 1. Visit the [Releases page](https://github.com/oscarbc96/agbridge/releases) on GitHub.
 2. Download the appropriate binary for your operating system.
@@ -56,9 +67,9 @@ agbridge --listen-address=:9090
    chmod +x agbridge
    ```
 
-### Option 2: Using Docker
+### Option 3: Using Docker
 
-1.	Pull the latest Docker image:
+1. Pull the latest Docker image:
    ```bash
    docker pull ghcr.io/oscarbc96/agbridge:latest
    ```
@@ -67,7 +78,7 @@ agbridge --listen-address=:9090
    docker run --rm -it -p 8080:8080 ghcr.io/oscarbc96/agbridge:latest --profile-name=myprofile --resource-id=12345 --listen-address=:8080
    ```
 
-### Option 3: Build from Source
+### Option 4: Build from Source
 
 1. Clone the repository:
    ```bash
