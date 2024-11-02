@@ -94,7 +94,5 @@ brews:
       name: agbridge
       pull_request:
         enabled: true
-    alternative_names:
-      - "agbridge@{{ .Major }}.{{ .Minor }}"
     test: |
       system "#{bin}/agbridge --version"
