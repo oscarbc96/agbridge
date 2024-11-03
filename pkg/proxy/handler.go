@@ -89,7 +89,7 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 func getURLWithoutQuery(u *url.URL) string {
 	uCopy := *u
 	uCopy.RawQuery = ""
-	return uCopy.String()
+	return strings.TrimRight(uCopy.String(), "/")
 }
 
 func handleError(w http.ResponseWriter, r *http.Request, err error, message string) {

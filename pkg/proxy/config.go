@@ -41,7 +41,7 @@ func (c *Config) Validate() (map[string]Handler, error) {
 
 		for _, resource := range resources {
 			if _, exists := result[*resource.Path]; exists {
-				return nil, fmt.Errorf("path %s already exists", *resource.Path)
+				return nil, fmt.Errorf("duplicate path %s found in the configuration for Rest API ID %s", *resource.Path, gw.RestAPIID)
 			}
 
 			if resource.ResourceMethods != nil {

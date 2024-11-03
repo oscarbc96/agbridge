@@ -24,7 +24,7 @@ func LoadConfigFor(profile, region string) (*aws.Config, error) {
 		options...,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("unable to load SDK config for profile %s, %w", profile, err)
+		return nil, fmt.Errorf("unable to load SDK config (profile: %s, region: %s), %w", profile, region, err)
 	}
 
 	return &cfg, nil
