@@ -32,7 +32,7 @@ func (c *Config) Validate() (map[string]Handler, error) {
 		if gw.ProfileName != "" {
 			awsCfg, err = apigateway.LoadConfigFor(gw.ProfileName)
 			if err != nil {
-				return nil, fmt.Errorf("Couldn't load AWS Config: %w", err)
+				return nil, fmt.Errorf("couldn't load AWS Config: %w", err)
 			}
 		} else {
 			awsCfg = apigateway.NewConfig()
@@ -40,7 +40,7 @@ func (c *Config) Validate() (map[string]Handler, error) {
 
 		resources, err := apigateway.DescribeAPIGateway(*awsCfg, gw.RestAPIID)
 		if err != nil {
-			return nil, fmt.Errorf("Couldn't describe API Gateway: %w", err)
+			return nil, fmt.Errorf("couldn't describe API Gateway: %w", err)
 		}
 
 		for _, resource := range resources {
