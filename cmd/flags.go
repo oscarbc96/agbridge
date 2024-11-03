@@ -10,6 +10,11 @@ import (
 	"github.com/oscarbc96/agbridge/pkg/log"
 )
 
+const (
+	DefaultConfigFileYaml = "agbridge.yaml"
+	DefaultConfigFileYml  = "agbridge.yml"
+)
+
 func setCustomUsage() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -87,7 +92,7 @@ func parseFlags() (*Flags, error) {
 	// Check if a custom config file is specified and verify its existence
 	if *config != "" {
 		if *profileName != "" || *restAPIID != "" || *region != "" {
-			return flags, errors.New("--config cannot be combined with --profile-name, --rest-api-id, or --region")
+			return flags, errors.New("`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`")
 		}
 
 		if _, err := os.Stat(*config); os.IsNotExist(err) {
@@ -98,27 +103,32 @@ func parseFlags() (*Flags, error) {
 
 		// --profile-name requires both --region and --rest-api-id
 		if *profileName != "" && (*restAPIID == "" || *region == "") {
-			return flags, errors.New("--profile-name requires both --region and --rest-api-id to be specified")
+			return flags, errors.New("`--profile-name` requires both `--region` and `--rest-api-id` to be specified")
 		}
 
 		// --region requires --rest-api-id
 		if *region != "" && *restAPIID == "" {
-			return flags, errors.New("--region requires --rest-api-id to be specified")
+			return flags, errors.New("`--region` requires `--rest-api-id` to be specified")
 		}
 
 		// If neither --config nor --rest-api-id is provided, fallback to default config file check
 		if *restAPIID == "" {
-			if _, err := os.Stat("agbridge.yaml"); os.IsNotExist(err) {
-				if _, err := os.Stat("agbridge.yml"); os.IsNotExist(err) {
-					return flags, errors.New("please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists")
-				} else {
-					flags.Config = "agbridge.yml"
-				}
-			} else {
-				flags.Config = "agbridge.yaml"
+			configFile, err := checkConfigFileExists(DefaultConfigFileYml, DefaultConfigFileYaml)
+			if err != nil {
+				return flags, errors.New("please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists")
 			}
+			flags.Config = configFile
 		}
 	}
 
 	return flags, nil
+}
+
+func checkConfigFileExists(filenames ...string) (string, error) {
+	for _, filename := range filenames {
+		if _, err := os.Stat(filename); err == nil {
+			return filename, nil
+		}
+	}
+	return "", errors.New("no config file found")
 }

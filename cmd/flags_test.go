@@ -78,7 +78,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "ProfileName without Region and RestAPIID",
 			args:   []string{"cmd", "--profile-name", "patata"},
-			expErr: "--profile-name requires both --region and --rest-api-id to be specified",
+			expErr: "`--profile-name` requires both `--region` and `--rest-api-id` to be specified",
 			expOpts: &Flags{
 				ProfileName:   "patata",
 				ListenAddress: ":8080",
@@ -88,7 +88,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Region without RestAPIID",
 			args:   []string{"cmd", "--region", "eu-west-1"},
-			expErr: "--region requires --rest-api-id to be specified",
+			expErr: "`--region` requires `--rest-api-id` to be specified",
 			expOpts: &Flags{
 				Region:        "eu-west-1",
 				ListenAddress: ":8080",
@@ -98,7 +98,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Config and RestAPIID",
 			args:   []string{"cmd", "--config", "config.yaml", "--rest-api-id", "12345"},
-			expErr: "--config cannot be combined with --profile-name, --rest-api-id, or --region",
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
 				RestAPIID:     "12345",
@@ -109,7 +109,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Config and ProfileName",
 			args:   []string{"cmd", "--config", "config.yaml", "--profile-name", "testprofile"},
-			expErr: "--config cannot be combined with --profile-name, --rest-api-id, or --region",
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
 				ProfileName:   "testprofile",
@@ -120,7 +120,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Config and Region",
 			args:   []string{"cmd", "--config", "config.yaml", "--region", "eu-west-1"},
-			expErr: "--config cannot be combined with --profile-name, --rest-api-id, or --region",
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
 				Region:        "eu-west-1",
@@ -141,7 +141,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "No Default Config Files",
 			args:   []string{"cmd"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelInfo,
@@ -170,7 +170,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Valid Listen Address",
 			args:   []string{"cmd", "--listen-address", ":9090"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":9090",
 				LogLevel:      log.LevelInfo,
@@ -188,7 +188,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Valid LogLevel - Debug",
 			args:   []string{"cmd", "--log-level", "debug"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelDebug,
@@ -197,7 +197,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Valid LogLevel - Info",
 			args:   []string{"cmd", "--log-level", "info"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelInfo,
@@ -206,7 +206,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Valid LogLevel - Warn",
 			args:   []string{"cmd", "--log-level", "warn"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelWarn,
@@ -215,7 +215,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Valid LogLevel - Error",
 			args:   []string{"cmd", "--log-level", "error"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelError,
@@ -224,7 +224,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Valid LogLevel - Fatal",
 			args:   []string{"cmd", "--log-level", "fatal"},
-			expErr: "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists",
+			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelFatal,
