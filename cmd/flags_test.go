@@ -267,7 +267,7 @@ func TestParseFlags(t *testing.T) {
 				require.NoError(t, err, "Expected no error")
 			} else {
 				require.Error(t, err, "Expected error")
-				assert.EqualError(t, err, tt.expErr)
+				require.EqualError(t, err, tt.expErr)
 			}
 			assert.Equal(t, tt.expOpts, opts, "Options mismatch")
 		})

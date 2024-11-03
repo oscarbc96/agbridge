@@ -9,12 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oscarbc96/agbridge/pkg/log"
-
-	"github.com/samber/lo"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	"github.com/oscarbc96/agbridge/pkg/log"
+	"github.com/samber/lo"
 )
 
 type Handler struct {
