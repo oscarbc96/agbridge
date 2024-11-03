@@ -245,18 +245,14 @@ func TestParseFlags(t *testing.T) {
 			resetFlags()
 
 			if tt.name == "No Flags with default config" || tt.name == "Only agbridge.yaml exists" {
-				file, err := os.Create("agbridge.yaml")
-				require.NoError(t, err)
-				file.Close()
-				defer os.Remove("agbridge.yaml")
+				cleanup := setupConfigFile(t, DefaultConfigFileYaml)
+				defer cleanup()
 			}
 
 			if tt.name == "Only agbridge.yml exists" {
 				os.Remove("agbridge.yaml")
-				file, err := os.Create("agbridge.yml")
-				require.NoError(t, err)
-				file.Close()
-				defer os.Remove("agbridge.yml")
+				cleanup := setupConfigFile(t, DefaultConfigFileYml)
+				defer cleanup()
 			}
 
 			os.Args = tt.args
@@ -271,5 +267,15 @@ func TestParseFlags(t *testing.T) {
 			}
 			assert.Equal(t, tt.expOpts, opts, "Options mismatch")
 		})
+	}
+}
+
+func setupConfigFile(t *testing.T, filename string) func() {
+	file, err := os.Create(filename)
+	require.NoError(t, err)
+	file.Close()
+
+	return func() {
+		os.Remove(filename)
 	}
 }
