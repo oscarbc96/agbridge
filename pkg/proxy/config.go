@@ -29,18 +29,14 @@ func (c *Config) Validate() (map[string]Handler, error) {
 	)
 
 	for _, gw := range c.Gateways {
-		if gw.ProfileName != "" {
-			awsCfg, err = apigateway.LoadConfigFor(gw.ProfileName)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't load AWS Config: %w", err)
-			}
-		} else {
-			awsCfg = apigateway.NewConfig()
+		awsCfg, err = apigateway.LoadConfigFor(gw.ProfileName, gw.Region)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't load AWS Config for profile %s: %w", gw.ProfileName, err)
 		}
 
 		resources, err := apigateway.DescribeAPIGateway(*awsCfg, gw.RestAPIID)
 		if err != nil {
-			return nil, fmt.Errorf("couldn't describe API Gateway: %w", err)
+			return nil, fmt.Errorf("couldn't describe API Gateway for RestAPIID %s: %w", gw.RestAPIID, err)
 		}
 
 		for _, resource := range resources {

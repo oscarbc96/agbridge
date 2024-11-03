@@ -8,17 +8,24 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 )
 
-func NewConfig() *aws.Config {
-	return aws.NewConfig()
-}
+func LoadConfigFor(profile, region string) (*aws.Config, error) {
+	var options []func(*config.LoadOptions) error
 
-func LoadConfigFor(profile string) (*aws.Config, error) {
+	if profile != "" {
+		options = append(options, config.WithSharedConfigProfile(profile))
+	}
+
+	if region != "" {
+		options = append(options, config.WithRegion(region))
+	}
+
 	cfg, err := config.LoadDefaultConfig(
 		context.TODO(),
-		config.WithSharedConfigProfile(profile),
+		options...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load SDK config for profile %s, %w", profile, err)
 	}
+
 	return &cfg, nil
 }
