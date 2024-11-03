@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/oscarbc96/agbridge/pkg/log"
 	"github.com/oscarbc96/agbridge/pkg/proxy"
@@ -68,7 +69,13 @@ func main() {
 
 	<-ctx.Done()
 	log.Info("Shutdown signal received, stopping proxy server...")
-	if err := proxy.Shutdown(); err != nil {
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := proxy.Shutdown(shutdownCtx); err != nil {
 		log.Fatal("Failed to stop proxy server gracefully", log.Err(err))
+	} else {
+		log.Info("Proxy server stopped successfully")
 	}
 }

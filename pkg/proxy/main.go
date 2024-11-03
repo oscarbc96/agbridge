@@ -28,8 +28,8 @@ func (p *Proxy) Start() error {
 	return p.server.ListenAndServe()
 }
 
-func (p *Proxy) Shutdown() error {
-	return p.server.Shutdown(context.Background())
+func (p *Proxy) Shutdown(ctx context.Context) error {
+	return p.server.Shutdown(ctx)
 }
 
 func (p *Proxy) Addr() string {
