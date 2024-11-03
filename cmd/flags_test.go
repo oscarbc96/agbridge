@@ -32,27 +32,27 @@ func TestParseFlags_IncompatibleFlagsConfigAndProfile(t *testing.T) {
 	_, err := parseFlags()
 
 	require.Error(t, err, "Expected incompatible flags error")
-	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --resource-id")
+	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --rest-api-id")
 }
 
-func TestParseFlags_IncompatibleFlagsConfigAndResourceID(t *testing.T) {
+func TestParseFlags_IncompatibleFlagsConfigAndRestAPIID(t *testing.T) {
 	resetFlags()
-	os.Args = []string{"cmd", "--config", "config.yaml", "--resource-id", "12345"}
+	os.Args = []string{"cmd", "--config", "config.yaml", "--rest-api-id", "12345"}
 
 	_, err := parseFlags()
 
 	require.Error(t, err, "Expected incompatible flags error")
-	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --resource-id")
+	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --rest-api-id")
 }
 
-func TestParseFlags_IncompatibleFlagsConfigResourceIDAndProfile(t *testing.T) {
+func TestParseFlags_IncompatibleFlagsConfigRestAPIIDAndProfile(t *testing.T) {
 	resetFlags()
-	os.Args = []string{"cmd", "--config", "config.yaml", "--resource-id", "12345", "--profile-name", "testprofile"}
+	os.Args = []string{"cmd", "--config", "config.yaml", "--rest-api-id", "12345", "--profile-name", "testprofile"}
 
 	_, err := parseFlags()
 
 	require.Error(t, err, "Expected incompatible flags error")
-	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --resource-id")
+	assert.EqualError(t, err, "--config cannot be combined with --profile-name or --rest-api-id")
 }
 
 func TestParseFlags_IncompatibleFlagsProfile(t *testing.T) {
@@ -62,30 +62,30 @@ func TestParseFlags_IncompatibleFlagsProfile(t *testing.T) {
 	_, err := parseFlags()
 
 	require.Error(t, err, "Expected incompatible flags error")
-	assert.EqualError(t, err, "--profile-name requires --resource-id to be specified")
+	assert.EqualError(t, err, "--profile-name requires --rest-api-id to be specified")
 }
 
-func TestParseFlags_ValidResourceID(t *testing.T) {
+func TestParseFlags_ValidRestAPIID(t *testing.T) {
 	resetFlags()
-	os.Args = []string{"cmd", "--resource-id", "12345"}
+	os.Args = []string{"cmd", "--rest-api-id", "12345"}
 
 	opts, err := parseFlags()
 
 	require.NoError(t, err, "Expected no error")
-	assert.Equal(t, "12345", opts.ResourceID, "Resource ID mismatch")
+	assert.Equal(t, "12345", opts.RestAPIID, "Rest API ID mismatch")
 	assert.Empty(t, opts.ProfileName, "Expected profile name to be empty")
 	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
 	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
 }
 
-func TestParseFlags_ValidResourceIDAndProfileName(t *testing.T) {
+func TestParseFlags_ValidRestAPIIDAndProfileName(t *testing.T) {
 	resetFlags()
-	os.Args = []string{"cmd", "--resource-id", "12345", "--profile-name", "testprofile"}
+	os.Args = []string{"cmd", "--rest-api-id", "12345", "--profile-name", "testprofile"}
 
 	opts, err := parseFlags()
 
 	require.NoError(t, err, "Expected no error")
-	assert.Equal(t, "12345", opts.ResourceID, "Resource ID mismatch")
+	assert.Equal(t, "12345", opts.RestAPIID, "Rest API ID mismatch")
 	assert.Equal(t, "testprofile", opts.ProfileName, "Profile name mismatch")
 	assert.Equal(t, log.LevelInfo, opts.LogLevel, "Default log level mismatch")
 	assert.Equal(t, ":8080", opts.ListenAddress, "Default listen address mismatch")
@@ -147,7 +147,7 @@ func TestParseFlags_NoDefaultConfigFiles(t *testing.T) {
 	_, err := parseFlags()
 
 	require.Error(t, err, "Expected error when no default config files are present")
-	assert.EqualError(t, err, "please provide --resource-id, --config, or ensure agbridge.yaml or agbridge.yml exists")
+	assert.EqualError(t, err, "please provide --rest-api-id, --config, or ensure agbridge.yaml or agbridge.yml exists")
 }
 
 func TestParseFlags_OnlyAgbridgeYmlExists(t *testing.T) {

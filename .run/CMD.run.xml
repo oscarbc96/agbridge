@@ -2,6 +2,7 @@
   <configuration default="false" name="CMD" type="GoApplicationRunConfiguration" factoryName="Go Application" singleton="false">
     <module name="agbridge" />
     <working_directory value="$PROJECT_DIR$" />
+    <parameters value="--rest-api-id zyfi5q93t9 --profile-name staging" />
     <kind value="DIRECTORY" />
     <package value="github.com/oscarbc96/agbridge" />
     <directory value="$PROJECT_DIR$/cmd" />

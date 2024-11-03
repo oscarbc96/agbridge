@@ -18,21 +18,21 @@ agbridge [flags]
 
 ### Flags
 
-| Flag               | Description                                                                                                      | Default       |
-|--------------------|------------------------------------------------------------------------------------------------------------------|---------------|
-| `--version`        | Displays the application version and exits.                                                                      |               |
-| `--config`         | Path to a configuration file for AGBridge. This flag cannot be used with `--profile-name` or `--resource-id`.    |               |
-| `--profile-name`   | Specifies the AWS profile name to access resources. Requires `--resource-id` to be specified.                    |               |
-| `--resource-id`    | Specifies the resource ID of the AWS API gateway. Required if `--config` is not provided.                        |               |
-| `--log-level`      | Sets the logging level for output messages. Options: `debug`, `info`, `warn`, `error`, `fatal`.                  | `info`        |
-| `--listen-address` | Address where AGBridge will listen for incoming requests. Format should be `host:port`.                          | `:8080`       |
+| Flag               | Description                                                                                                   | Default       |
+|--------------------|---------------------------------------------------------------------------------------------------------------|---------------|
+| `--version`        | Displays the application version and exits.                                                                   |               |
+| `--config`         | Path to a configuration file for AGBridge. This flag cannot be used with `--profile-name` or `--resource-id`. |               |
+| `--profile-name`   | Specifies the AWS profile name to access resources. Requires `--rest-api-id` to be specified.                 |               |
+| `--rest-api-id`    | Specifies the Rest API ID of the AWS API gateway. Required if `--config` is not provided.                     |               |
+| `--log-level`      | Sets the logging level for output messages. Options: `debug`, `info`, `warn`, `error`, `fatal`.               | `info`        |
+| `--listen-address` | Address where AGBridge will listen for incoming requests. Format should be `host:port`.                       | `:8080`       |
 
 ### Examples
 
-#### Specify Resource with Profile
+#### Specify API GW with Profile
 Specify a resource and profile to access a private API gateway:
 ```bash
-agbridge --profile-name=myprofile --resource-id=12345
+agbridge --profile-name=myprofile --rest-api-id=12345
 ```
 
 #### Load a Specific Configuration File
@@ -77,7 +77,7 @@ agbridge --listen-address=:9090
    ```
 2. Run the container with appropriate flags. For example:
    ```bash
-   docker run --rm -it -p 8080:8080 ghcr.io/oscarbc96/agbridge:latest --profile-name=myprofile --resource-id=12345 --listen-address=:8080
+   docker run --rm -it -p 8080:8080 ghcr.io/oscarbc96/agbridge:latest --profile-name=myprofile --rest-api-id=12345 --listen-address=:8080
    ```
 
 ### Option 4: Build from Source
