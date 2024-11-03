@@ -18,14 +18,15 @@ agbridge [flags]
 
 ### Flags
 
-| Flag               | Description                                                                                                   | Default       |
-|--------------------|---------------------------------------------------------------------------------------------------------------|---------------|
-| `--version`        | Displays the application version and exits.                                                                   |               |
-| `--config`         | Path to a configuration file for AGBridge. This flag cannot be used with `--profile-name` or `--resource-id`. |               |
-| `--profile-name`   | Specifies the AWS profile name to access resources. Requires `--rest-api-id` to be specified.                 |               |
-| `--rest-api-id`    | Specifies the Rest API ID of the AWS API gateway. Required if `--config` is not provided.                     |               |
-| `--log-level`      | Sets the logging level for output messages. Options: `debug`, `info`, `warn`, `error`, `fatal`.               | `info`        |
-| `--listen-address` | Address where AGBridge will listen for incoming requests. Format should be `host:port`.                       | `:8080`       |
+| Flag               | Description                                                                                                                | Default |
+|--------------------|----------------------------------------------------------------------------------------------------------------------------|---------|
+| `--version`        | Displays the application version and exits.                                                                                |         |
+| `--config`         | Path to a configuration file for AGBridge. This flag cannot be used with `--profile-name`, `--rest-api-id`, or `--region`. |         |
+| `--profile-name`   | Specifies the AWS profile name to access resources. Requires `--rest-api-id` and `--region` to be specified.               |         |
+| `--rest-api-id`    | Specifies the Rest API ID of the AWS API gateway. Required if `--config` is not provided.                                  |         |
+| `--region`         | Specifies the AWS region for the API gateway. Requires `--rest-api-id` and `--profile-name`.                               |         |
+| `--log-level`      | Sets the logging level for output messages. Options: `debug`, `info`, `warn`, `error`, `fatal`.                            | `info`  |
+| `--listen-address` | Address where AGBridge will listen for incoming requests. Format should be `host:port`.                                    | `:8080` |
 
 ### Examples
 
