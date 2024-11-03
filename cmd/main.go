@@ -20,7 +20,7 @@ var (
 
 func loadProxyConfig(flags *Flags) (*proxy.Config, error) {
 	if flags.RestAPIID != "" {
-		return proxy.NewConfig(flags.RestAPIID, flags.ProfileName, "eu-west-1"), nil
+		return proxy.NewConfig(flags.RestAPIID, flags.ProfileName, flags.Region), nil
 	}
 
 	cfg, err := proxy.LoadConfig(flags.Config)
