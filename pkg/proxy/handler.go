@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,7 +44,7 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 
 	client := apigateway.NewFromConfig(handler.Config)
 	resp, err := client.TestInvokeMethod(
-		context.Background(),
+		r.Context(),
 		&apigateway.TestInvokeMethodInput{
 			ResourceId:          &handler.ResourceID,
 			RestApiId:           &handler.RestAPIID,
