@@ -19,7 +19,7 @@ func PrintMappings(handlerMapping map[string]Handler) error {
 	})
 
 	for path, handler := range handlerMapping {
-		accountID, identity, err := awsutils.GetAWSAccountDetails(handler.Config)
+		accountID, identity, err := awsutils.GetAccountDetails(handler.Config)
 		if err != nil {
 			return err
 		}

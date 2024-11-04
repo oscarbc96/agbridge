@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
-func GetAWSAccountDetails(config aws.Config) (string, string, error) {
+func GetAccountDetails(config aws.Config) (string, string, error) {
 	stsClient := sts.NewFromConfig(config)
 
 	callerIdentity, err := stsClient.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
