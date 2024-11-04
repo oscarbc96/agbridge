@@ -3,9 +3,8 @@ package proxy
 import (
 	"os"
 
-	"github.com/oscarbc96/agbridge/pkg/awsutils"
-
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/oscarbc96/agbridge/pkg/awsutils"
 )
 
 type AWSConfigInfo struct {

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samber/lo"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/oscarbc96/agbridge/pkg/awsutils"
+	"github.com/samber/lo"
 	"gopkg.in/yaml.v3"
 )
 
