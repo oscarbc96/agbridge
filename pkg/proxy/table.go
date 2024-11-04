@@ -7,12 +7,6 @@ import (
 	"github.com/oscarbc96/agbridge/pkg/awsutils"
 )
 
-type AWSConfigInfo struct {
-	Profile   string
-	AccountID string
-	Region    string
-}
-
 func PrintMappings(handlerMapping map[string]Handler) error {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
