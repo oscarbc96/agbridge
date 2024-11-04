@@ -21,12 +21,14 @@ var (
 
 func loadProxyConfig(flags *Flags) (*proxy.Config, error) {
 	if flags.RestAPIID != "" {
+		log.Info("Loading configuration from provided flags")
 		return proxy.NewConfig(flags.RestAPIID, flags.ProfileName, flags.Region), nil
 	}
 
+	log.Info("Loading configuration from config file", log.String("config", flags.Config))
 	cfg, err := proxy.LoadConfig(flags.Config)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't load config file: %w", err)
+		return nil, fmt.Errorf("failed to load config file %s: %w", flags.Config, err)
 	}
 
 	return cfg, nil
@@ -34,7 +36,7 @@ func loadProxyConfig(flags *Flags) (*proxy.Config, error) {
 
 func main() {
 	flags, err := parseFlags()
-	// Setup logging, before raising errors of flags parsing
+	// Setup logging, before raising errors during flags parsing
 	log.Setup(flags.LogLevel)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -52,7 +54,7 @@ func main() {
 
 	handlerMapping, err := cfg.Validate()
 	if err != nil {
-		log.Fatal("Couldn't validate config", log.Err(err))
+		log.Fatal("Configuration validation failed", log.Err(err))
 	}
 
 	err = proxy.PrintMappings(handlerMapping)
@@ -66,9 +68,9 @@ func main() {
 	defer stop()
 
 	go func() {
-		log.Info("Starting proxy", log.String("addr", proxy.Addr()))
+		log.Info("Starting proxy server", log.String("address", proxy.Addr()))
 		if err := proxy.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatal("Proxy server error", log.Err(err))
+			log.Fatal("Proxy server encountered an error", log.Err(err))
 		}
 	}()
 
