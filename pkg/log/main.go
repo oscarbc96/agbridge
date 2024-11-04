@@ -13,19 +13,13 @@ const (
 )
 
 var (
-	With  = slog.With
-	Group = slog.Group
+	With = slog.With
 
-	Debug = slog.Debug
-	Info  = slog.Info
-	Warn  = slog.Warn
-	Error = slog.Error
+	Info = slog.Info
 
-	Any    = slog.Any
-	String = slog.String
-	Time   = slog.Time
-	Int    = slog.Int
-	Bool   = slog.Bool
+	Duration = slog.Duration
+	Int      = slog.Int
+	String   = slog.String
 )
 
 type Level = slog.Level

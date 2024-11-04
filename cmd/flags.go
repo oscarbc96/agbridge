@@ -10,6 +10,11 @@ import (
 	"github.com/oscarbc96/agbridge/pkg/log"
 )
 
+const (
+	DefaultConfigFileYaml = "agbridge.yaml"
+	DefaultConfigFileYml  = "agbridge.yml"
+)
+
 func setCustomUsage() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -22,8 +27,8 @@ Examples:
   # Use a specific config file
   %[1]s --config=config.yaml
 
-  # Set profile name with a resource ID
-  %[1]s --profile-name=myprofile --resource-id=12345
+  # Set profile name with a Rest API ID
+  %[1]s --profile-name=myprofile --rest-api-id=12345
 
   # Set log level to debug
   %[1]s --log-level=debug
@@ -38,79 +43,92 @@ Examples:
 }
 
 type Flags struct {
-	Version       bool
 	Config        string
-	ProfileName   string
-	ResourceID    string
 	ListenAddress string
 	LogLevel      log.Level
+	ProfileName   string
+	Region        string
+	RestAPIID     string
+	Version       bool
 }
 
 func parseFlags() (*Flags, error) {
+	setCustomUsage()
+
 	version := flag.Bool("version", false, "Displays the application version and exits.")
-	config := flag.String("config", "", "Specifies the path to a configuration file (cannot be used with --profile-name or --resource-id).")
-	profileName := flag.String("profile-name", "", "Specifies the profile name (requires --resource-id to be specified).")
-	resourceID := flag.String("resource-id", "", "Specifies the resource ID (required if --config is not provided).")
+	config := flag.String("config", "", "Specifies the path to a configuration file (cannot be used with --profile-name, --rest-api-id, or --region).")
+	profileName := flag.String("profile-name", "", "Specifies the profile name (requires --rest-api-id and --region to be specified).")
+	restAPIID := flag.String("rest-api-id", "", "Specifies the Rest API ID (required if --config is not provided).")
+	region := flag.String("region", "", "Specifies the AWS region to use with --profile-name and --rest-api-id.")
 	logLevelStr := flag.String("log-level", "info", "Sets the log verbosity level. Options: debug, info, warn, error, fatal.")
 	listenAddress := flag.String("listen-address", ":8080", "Address where the proxy server will listen for incoming requests.")
 
 	flag.Parse()
 
-	// Check for version flag
 	if *version {
 		return &Flags{Version: true}, nil
 	}
 
-	// Parse log level
 	logLevel, err := log.ParseLogLevel(*logLevelStr)
 	if err != nil {
-		return nil, err
+		return &Flags{LogLevel: logLevel}, err
 	}
 
 	flags := &Flags{
 		Version:       *version,
 		Config:        *config,
 		ProfileName:   *profileName,
-		ResourceID:    *resourceID,
+		RestAPIID:     *restAPIID,
 		ListenAddress: *listenAddress,
 		LogLevel:      logLevel,
+		Region:        *region,
 	}
 
 	// Validate listen address format
 	if _, _, err := net.SplitHostPort(*listenAddress); err != nil {
-		return flags, fmt.Errorf("invalid listen address format")
+		return flags, fmt.Errorf("invalid listen address format: %w", err)
 	}
 
 	// Check if a custom config file is specified and verify its existence
 	if *config != "" {
-		// If config is specified, it must not be combined with other flags
-		if *profileName != "" || *resourceID != "" {
-			return flags, errors.New("--config cannot be combined with --profile-name or --resource-id")
+		if *profileName != "" || *restAPIID != "" || *region != "" {
+			return flags, errors.New("`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`")
 		}
 
-		// Ensure the config file exists
 		if _, err := os.Stat(*config); os.IsNotExist(err) {
-			return flags, errors.New("config file does not exist")
+			return flags, fmt.Errorf("config file does not exist: %w", err)
 		}
 	} else {
-		// If config is not specified, check the necessity of resource ID
-		if *resourceID == "" && *profileName != "" {
-			return flags, errors.New("--profile-name requires --resource-id to be specified")
+		// If no --config, check the rules for --rest-api-id, --region, and --profile-name
+
+		// --profile-name requires both --region and --rest-api-id
+		if *profileName != "" && (*restAPIID == "" || *region == "") {
+			return flags, errors.New("`--profile-name` requires both `--region` and `--rest-api-id` to be specified")
 		}
 
-		// If no config and no resource ID, check for default config files
-		if *resourceID == "" {
-			if _, err := os.Stat("agbridge.yaml"); os.IsNotExist(err) {
-				if _, err := os.Stat("agbridge.yml"); os.IsNotExist(err) {
-					return flags, errors.New("please provide --resource-id, --config, or ensure agbridge.yaml or agbridge.yml exists")
-				} else {
-					flags.Config = "agbridge.yml" // Default to agbridge.yml if it exists
-				}
-			} else {
-				flags.Config = "agbridge.yaml" // Default to agbridge.yaml if it exists
+		// --region requires --rest-api-id
+		if *region != "" && *restAPIID == "" {
+			return flags, errors.New("`--region` requires `--rest-api-id` to be specified")
+		}
+
+		// If neither --config nor --rest-api-id is provided, fallback to default config file check
+		if *restAPIID == "" {
+			configFile, err := checkConfigFileExists(DefaultConfigFileYml, DefaultConfigFileYaml)
+			if err != nil {
+				return flags, errors.New("please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists")
 			}
+			flags.Config = configFile
 		}
 	}
 
 	return flags, nil
+}
+
+func checkConfigFileExists(filenames ...string) (string, error) {
+	for _, filename := range filenames {
+		if _, err := os.Stat(filename); err == nil {
+			return filename, nil
+		}
+	}
+	return "", errors.New("no config file found")
 }
