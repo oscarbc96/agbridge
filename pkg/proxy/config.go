@@ -7,7 +7,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/oscarbc96/agbridge/pkg/apigateway"
+	"github.com/oscarbc96/agbridge/pkg/awsutils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -29,12 +29,12 @@ func (c *Config) Validate() (map[string]Handler, error) {
 	)
 
 	for _, gw := range c.Gateways {
-		awsCfg, err = apigateway.LoadConfigFor(gw.ProfileName, gw.Region)
+		awsCfg, err = awsutils.LoadConfigFor(gw.ProfileName, gw.Region)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't load AWS Config for profile %s: %w", gw.ProfileName, err)
 		}
 
-		resources, err := apigateway.DescribeAPIGateway(*awsCfg, gw.RestAPIID)
+		resources, err := awsutils.DescribeAPIGateway(*awsCfg, gw.RestAPIID)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't describe API Gateway for RestAPIID %s: %w", gw.RestAPIID, err)
 		}

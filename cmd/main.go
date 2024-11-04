@@ -55,6 +55,11 @@ func main() {
 		log.Fatal("Couldn't validate config", log.Err(err))
 	}
 
+	err = proxy.PrintMappings(handlerMapping)
+	if err != nil {
+		log.Fatal("Failed to print mappings", log.Err(err))
+	}
+
 	proxy := proxy.NewProxy(flags.ListenAddress, handlerMapping)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

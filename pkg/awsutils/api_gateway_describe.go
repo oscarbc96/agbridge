@@ -1,4 +1,4 @@
-package apigateway
+package awsutils
 
 import (
 	"context"
