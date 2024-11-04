@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
-
 	"github.com/oscarbc96/agbridge/internal/testutil"
 	"github.com/stretchr/testify/suite"
 )
