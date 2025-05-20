@@ -1,8 +1,6 @@
 module github.com/oscarbc96/agbridge
 
-go 1.23.1
-
-toolchain go1.23.2
+go 1.24.2
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.3
@@ -13,6 +11,7 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/samber/lo v1.50.0
 	github.com/samber/slog-zerolog/v2 v2.7.3
+	github.com/spf13/afero v1.14.0
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/localstack v0.37.0

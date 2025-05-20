@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/oscarbc96/agbridge/pkg/log"
 	"github.com/oscarbc96/agbridge/pkg/proxy"
+	"github.com/spf13/afero"
 )
 
 var (
@@ -35,7 +37,9 @@ func loadProxyConfig(flags *Flags) (*proxy.Config, error) {
 }
 
 func main() {
-	flags, err := parseFlags()
+	fs := afero.NewOsFs()
+
+	flags, err := parseFlags(fs, os.Args)
 	// Setup logging, before raising errors during flags parsing
 	log.Setup(flags.LogLevel)
 	if err != nil {

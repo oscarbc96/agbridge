@@ -7,7 +7,10 @@ import (
 	"net"
 	"os"
 
+	"github.com/samber/lo"
+
 	"github.com/oscarbc96/agbridge/pkg/log"
+	"github.com/spf13/afero"
 )
 
 const (
@@ -15,9 +18,29 @@ const (
 	DefaultConfigFileYml  = "agbridge.yml"
 )
 
-func setCustomUsage() {
+type Flags struct {
+	Config        string
+	ListenAddress string
+	LogLevel      log.Level
+	ProfileName   string
+	Region        string
+	RestAPIID     string
+	Version       bool
+}
+
+func parseFlags(fs afero.Fs, args []string) (*Flags, error) {
+	fset := flag.NewFlagSet("agbridge", flag.ContinueOnError)
+
+	version := fset.Bool("version", false, "Displays the application version and exits.")
+	config := fset.String("config", "", "Specifies the path to a configuration file (cannot be used with --profile-name, --rest-api-id, or --region).")
+	profileName := fset.String("profile-name", "", "Specifies the profile name (requires --rest-api-id and --region to be specified).")
+	restAPIID := fset.String("rest-api-id", "", "Specifies the Rest API ID (required if --config is not provided).")
+	region := fset.String("region", "", "Specifies the AWS region to use with --profile-name and --rest-api-id.")
+	logLevelStr := fset.String("log-level", "info", "Sets the log verbosity level. Options: debug, info, warn, error, fatal.")
+	listenAddress := fset.String("listen-address", ":8080", "Address where the proxy server will listen for incoming requests.")
+
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", args[0])
 		flag.PrintDefaults()
 		fmt.Fprintf(os.Stderr, `
 Examples:
@@ -38,32 +61,12 @@ Examples:
 
   # Use the default config file (agbridge.yaml or agbridge.yml if they exist)
   %[1]s
-`, os.Args[0])
+`, args[0])
 	}
-}
 
-type Flags struct {
-	Config        string
-	ListenAddress string
-	LogLevel      log.Level
-	ProfileName   string
-	Region        string
-	RestAPIID     string
-	Version       bool
-}
-
-func parseFlags() (*Flags, error) {
-	setCustomUsage()
-
-	version := flag.Bool("version", false, "Displays the application version and exits.")
-	config := flag.String("config", "", "Specifies the path to a configuration file (cannot be used with --profile-name, --rest-api-id, or --region).")
-	profileName := flag.String("profile-name", "", "Specifies the profile name (requires --rest-api-id and --region to be specified).")
-	restAPIID := flag.String("rest-api-id", "", "Specifies the Rest API ID (required if --config is not provided).")
-	region := flag.String("region", "", "Specifies the AWS region to use with --profile-name and --rest-api-id.")
-	logLevelStr := flag.String("log-level", "info", "Sets the log verbosity level. Options: debug, info, warn, error, fatal.")
-	listenAddress := flag.String("listen-address", ":8080", "Address where the proxy server will listen for incoming requests.")
-
-	flag.Parse()
+	if err := fset.Parse(args); err != nil {
+		return nil, err
+	}
 
 	if *version {
 		return &Flags{Version: true}, nil
@@ -95,7 +98,7 @@ func parseFlags() (*Flags, error) {
 			return flags, errors.New("`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`")
 		}
 
-		if _, err := os.Stat(*config); os.IsNotExist(err) {
+		if _, err := fs.Stat(*config); os.IsNotExist(err) {
 			return flags, fmt.Errorf("config file does not exist: %w", err)
 		}
 	} else {
@@ -113,8 +116,11 @@ func parseFlags() (*Flags, error) {
 
 		// If neither --config nor --rest-api-id is provided, fallback to default config file check
 		if *restAPIID == "" {
-			configFile, err := checkConfigFileExists(DefaultConfigFileYml, DefaultConfigFileYaml)
-			if err != nil {
+			configFile, ok := lo.Find([]string{DefaultConfigFileYml, DefaultConfigFileYaml}, func(name string) bool {
+				_, err := fs.Stat(name)
+				return err == nil
+			})
+			if !ok {
 				return flags, errors.New("please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists")
 			}
 			flags.Config = configFile
@@ -122,13 +128,4 @@ func parseFlags() (*Flags, error) {
 	}
 
 	return flags, nil
-}
-
-func checkConfigFileExists(filenames ...string) (string, error) {
-	for _, filename := range filenames {
-		if _, err := os.Stat(filename); err == nil {
-			return filename, nil
-		}
-	}
-	return "", errors.New("no config file found")
 }

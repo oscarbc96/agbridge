@@ -1,7 +1,10 @@
+version: "2"
 linters:
   enable:
-    - gofumpt
     - testifylint
-linters-settings:
-  gofumpt:
-    extra-rules: true
+formatters:
+  enable:
+    - gofumpt
+  settings:
+    gofumpt:
+      extra-rules: true

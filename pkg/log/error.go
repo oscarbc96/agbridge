@@ -7,5 +7,5 @@ import (
 const errKey = "err"
 
 func Err(err error) slog.Attr {
-	return slog.Any(errKey, err)
+	return slog.String(errKey, err.Error())
 }
