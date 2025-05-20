@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/localstack"
 )
@@ -13,7 +14,7 @@ import (
 func CreateLocalStackContainer(ctx context.Context) (*aws.Config, *localstack.LocalStackContainer, error) {
 	lsContainer, err := localstack.Run(
 		ctx,
-		"localstack/localstack:3.8.1",
+		"localstack/localstack:4.4.0",
 		testcontainers.CustomizeRequest(testcontainers.GenericContainerRequest{
 			ContainerRequest: testcontainers.ContainerRequest{
 				Env: map[string]string{"SERVICES": "apigateway"},
@@ -34,7 +35,11 @@ func CreateLocalStackContainer(ctx context.Context) (*aws.Config, *localstack.Lo
 		return nil, nil, err
 	}
 
-	awsCfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-1"))
+	awsCfg, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion("eu-west-1"),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
+	)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -1,0 +1,6 @@
+[tools]
+go = "1.24.2"
+"ubi:golangci/golangci-lint" = "latest"
+"ubi:goreleaser/goreleaser" = "latest"
+"ubi:gotestyourself/gotestsum" = "latest"
+"ubi:mvdan/gofumpt" = "latest"

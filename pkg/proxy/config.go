@@ -2,11 +2,12 @@ package proxy
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/oscarbc96/agbridge/pkg/awsutils"
+	"github.com/oscarbc96/agbridge/pkg/log"
 	"github.com/samber/lo"
+	"github.com/spf13/afero"
 	"gopkg.in/yaml.v3"
 )
 
@@ -57,12 +58,16 @@ func (c *Config) Validate() (map[string]Handler, error) {
 	return result, nil
 }
 
-func LoadConfig(filename string) (*Config, error) {
-	file, err := os.Open(filename)
+func LoadConfig(fs afero.Fs, filename string) (*Config, error) {
+	file, err := fs.Open(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open Config file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			log.Fatal("Failed to close config file", log.Err(cerr), log.String("file", filename))
+		}
+	}()
 
 	var config Config
 	decoder := yaml.NewDecoder(file)

@@ -1,29 +1,27 @@
 package main
 
 import (
-	"flag"
-	"os"
 	"testing"
 
 	"github.com/oscarbc96/agbridge/pkg/log"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func resetFlags() {
-	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-}
-
 func TestParseFlags(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		args    []string
 		expErr  string
 		expOpts *Flags
+		setup   func(t *testing.T, fs afero.Fs)
 	}{
 		{
 			name:   "Version only",
-			args:   []string{"cmd", "--version"},
+			args:   []string{"--version"},
 			expErr: "",
 			expOpts: &Flags{
 				Version: true,
@@ -31,17 +29,20 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "No Flags with default config",
-			args:   []string{"cmd"},
+			args:   []string{},
 			expErr: "",
 			expOpts: &Flags{
 				Config:        "agbridge.yaml",
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelInfo,
 			},
+			setup: func(t *testing.T, fs afero.Fs) {
+				require.NoError(t, afero.WriteFile(fs, DefaultConfigFileYaml, []byte("dummy"), 0o644))
+			},
 		},
 		{
 			name:   "Valid RestAPIID only",
-			args:   []string{"cmd", "--rest-api-id", "12345"},
+			args:   []string{"--rest-api-id", "12345"},
 			expErr: "",
 			expOpts: &Flags{
 				RestAPIID:     "12345",
@@ -53,7 +54,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid Region and RestAPIID",
-			args:   []string{"cmd", "--region", "eu-west-1", "--rest-api-id", "12345"},
+			args:   []string{"--region", "eu-west-1", "--rest-api-id", "12345"},
 			expErr: "",
 			expOpts: &Flags{
 				RestAPIID:     "12345",
@@ -65,7 +66,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid Region, RestAPIID, and ProfileName",
-			args:   []string{"cmd", "--region", "eu-west-1", "--rest-api-id", "12345", "--profile-name", "patata"},
+			args:   []string{"--region", "eu-west-1", "--rest-api-id", "12345", "--profile-name", "patata"},
 			expErr: "",
 			expOpts: &Flags{
 				RestAPIID:     "12345",
@@ -77,7 +78,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "ProfileName without Region and RestAPIID",
-			args:   []string{"cmd", "--profile-name", "patata"},
+			args:   []string{"--profile-name", "patata"},
 			expErr: "`--profile-name` requires both `--region` and `--rest-api-id` to be specified",
 			expOpts: &Flags{
 				ProfileName:   "patata",
@@ -87,7 +88,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Region without RestAPIID",
-			args:   []string{"cmd", "--region", "eu-west-1"},
+			args:   []string{"--region", "eu-west-1"},
 			expErr: "`--region` requires `--rest-api-id` to be specified",
 			expOpts: &Flags{
 				Region:        "eu-west-1",
@@ -97,7 +98,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Config and RestAPIID",
-			args:   []string{"cmd", "--config", "config.yaml", "--rest-api-id", "12345"},
+			args:   []string{"--config", "config.yaml", "--rest-api-id", "12345"},
 			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
@@ -108,7 +109,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Config and ProfileName",
-			args:   []string{"cmd", "--config", "config.yaml", "--profile-name", "testprofile"},
+			args:   []string{"--config", "config.yaml", "--profile-name", "testprofile"},
 			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
@@ -119,7 +120,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Config and Region",
-			args:   []string{"cmd", "--config", "config.yaml", "--region", "eu-west-1"},
+			args:   []string{"--config", "config.yaml", "--region", "eu-west-1"},
 			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
@@ -130,8 +131,8 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Invalid Config File",
-			args:   []string{"cmd", "--config", "nonexistent.yaml"},
-			expErr: "config file does not exist: stat nonexistent.yaml: no such file or directory",
+			args:   []string{"--config", "nonexistent.yaml"},
+			expErr: "config file does not exist: open nonexistent.yaml: file does not exist",
 			expOpts: &Flags{
 				Config:        "nonexistent.yaml",
 				ListenAddress: ":8080",
@@ -140,7 +141,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "No Default Config Files",
-			args:   []string{"cmd"},
+			args:   []string{},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
@@ -149,27 +150,33 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Only agbridge.yml exists",
-			args:   []string{"cmd"},
+			args:   []string{},
 			expErr: "",
 			expOpts: &Flags{
 				Config:        "agbridge.yml",
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelInfo,
 			},
+			setup: func(t *testing.T, fs afero.Fs) {
+				require.NoError(t, afero.WriteFile(fs, DefaultConfigFileYml, []byte("dummy"), 0o644))
+			},
 		},
 		{
 			name:   "Only agbridge.yaml exists",
-			args:   []string{"cmd"},
+			args:   []string{},
 			expErr: "",
 			expOpts: &Flags{
 				Config:        "agbridge.yaml",
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelInfo,
 			},
+			setup: func(t *testing.T, fs afero.Fs) {
+				require.NoError(t, afero.WriteFile(fs, DefaultConfigFileYaml, []byte("dummy"), 0o644))
+			},
 		},
 		{
 			name:   "Valid Listen Address",
-			args:   []string{"cmd", "--listen-address", ":9090"},
+			args:   []string{"--listen-address", ":9090"},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":9090",
@@ -178,7 +185,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Invalid Listen Address",
-			args:   []string{"cmd", "--listen-address", "qwerty"},
+			args:   []string{"--listen-address", "qwerty"},
 			expErr: "invalid listen address format: address qwerty: missing port in address",
 			expOpts: &Flags{
 				ListenAddress: "qwerty",
@@ -187,7 +194,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid LogLevel - Debug",
-			args:   []string{"cmd", "--log-level", "debug"},
+			args:   []string{"--log-level", "debug"},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
@@ -196,7 +203,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid LogLevel - Info",
-			args:   []string{"cmd", "--log-level", "info"},
+			args:   []string{"--log-level", "info"},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
@@ -205,7 +212,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid LogLevel - Warn",
-			args:   []string{"cmd", "--log-level", "warn"},
+			args:   []string{"--log-level", "warn"},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
@@ -214,7 +221,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid LogLevel - Error",
-			args:   []string{"cmd", "--log-level", "error"},
+			args:   []string{"--log-level", "error"},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
@@ -223,7 +230,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Valid LogLevel - Fatal",
-			args:   []string{"cmd", "--log-level", "fatal"},
+			args:   []string{"--log-level", "fatal"},
 			expErr: "please provide `--rest-api-id`, `--config`, or ensure agbridge.yaml or agbridge.yml exists",
 			expOpts: &Flags{
 				ListenAddress: ":8080",
@@ -232,7 +239,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:   "Invalid LogLevel",
-			args:   []string{"cmd", "--log-level", "verbose"},
+			args:   []string{"--log-level", "verbose"},
 			expErr: "invalid log level: must be one of debug, info, warn, error, fatal",
 			expOpts: &Flags{
 				LogLevel: log.LevelInfo,
@@ -242,22 +249,14 @@ func TestParseFlags(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetFlags()
+			t.Parallel()
 
-			if tt.name == "No Flags with default config" || tt.name == "Only agbridge.yaml exists" {
-				cleanup := setupConfigFile(t, DefaultConfigFileYaml)
-				defer cleanup()
+			fs := afero.NewMemMapFs()
+			if tt.setup != nil {
+				tt.setup(t, fs)
 			}
 
-			if tt.name == "Only agbridge.yml exists" {
-				os.Remove("agbridge.yaml")
-				cleanup := setupConfigFile(t, DefaultConfigFileYml)
-				defer cleanup()
-			}
-
-			os.Args = tt.args
-
-			opts, err := parseFlags()
+			opts, err := parseFlags(fs, tt.args)
 
 			if tt.expErr == "" {
 				require.NoError(t, err, "Expected no error")
@@ -267,15 +266,5 @@ func TestParseFlags(t *testing.T) {
 			}
 			assert.Equal(t, tt.expOpts, opts, "Options mismatch")
 		})
-	}
-}
-
-func setupConfigFile(t *testing.T, filename string) func() {
-	file, err := os.Create(filename)
-	require.NoError(t, err)
-	file.Close()
-
-	return func() {
-		os.Remove(filename)
 	}
 }
