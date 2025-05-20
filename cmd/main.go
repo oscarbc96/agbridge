@@ -21,14 +21,14 @@ var (
 	date    = "unknown"
 )
 
-func loadProxyConfig(flags *Flags) (*proxy.Config, error) {
+func loadProxyConfig(fs afero.Fs, flags *Flags) (*proxy.Config, error) {
 	if flags.RestAPIID != "" {
 		log.Info("Loading configuration from provided flags")
 		return proxy.NewConfig(flags.RestAPIID, flags.ProfileName, flags.Region), nil
 	}
 
 	log.Info("Loading configuration from config file", log.String("config", flags.Config))
-	cfg, err := proxy.LoadConfig(flags.Config)
+	cfg, err := proxy.LoadConfig(fs, flags.Config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config file %s: %w", flags.Config, err)
 	}
@@ -51,7 +51,7 @@ func main() {
 		return
 	}
 
-	cfg, err := loadProxyConfig(flags)
+	cfg, err := loadProxyConfig(fs, flags)
 	if err != nil {
 		log.Fatal("Failed to load configuration", log.Err(err))
 	}

@@ -13,7 +13,7 @@ import (
 func CreateLocalStackContainer(ctx context.Context) (*aws.Config, *localstack.LocalStackContainer, error) {
 	lsContainer, err := localstack.Run(
 		ctx,
-		"localstack/localstack:3.8.1",
+		"localstack/localstack:4.4.0",
 		testcontainers.CustomizeRequest(testcontainers.GenericContainerRequest{
 			ContainerRequest: testcontainers.ContainerRequest{
 				Env: map[string]string{"SERVICES": "apigateway"},
