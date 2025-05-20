@@ -7,9 +7,8 @@ import (
 	"net"
 	"os"
 
-	"github.com/samber/lo"
-
 	"github.com/oscarbc96/agbridge/pkg/log"
+	"github.com/samber/lo"
 	"github.com/spf13/afero"
 )
 
