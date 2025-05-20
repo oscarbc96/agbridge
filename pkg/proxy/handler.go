@@ -42,6 +42,13 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 		return
 	}
 
+	log.Debug("Sending request to API Gateway",
+		log.String("url", r.URL.String()),
+		log.String("method", r.Method),
+		log.Any("headers", r.Header),
+		log.String("body", string(body)),
+	)
+
 	client := apigateway.NewFromConfig(handler.Config)
 	resp, err := client.TestInvokeMethod(
 		r.Context(),
@@ -58,6 +65,13 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 		handleError(w, r, err, "Error calling API Gateway")
 		return
 	}
+
+	log.Debug("Received response from API Gateway",
+		log.Int("status_code", int(resp.Status)),
+		log.Any("headers", resp.Headers),
+		log.Any("multi_value_headers", resp.MultiValueHeaders),
+		log.String("body", aws.ToString(resp.Body)),
+	)
 
 	// Copy HTTP status code from test-invoke response to the proxy response
 	w.WriteHeader(int(resp.Status))

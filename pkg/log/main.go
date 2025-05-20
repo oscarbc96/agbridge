@@ -15,8 +15,10 @@ const (
 var (
 	With = slog.With
 
-	Info = slog.Info
+	Info  = slog.Info
+	Debug = slog.Debug
 
+	Any      = slog.Any
 	Duration = slog.Duration
 	Int      = slog.Int
 	String   = slog.String
