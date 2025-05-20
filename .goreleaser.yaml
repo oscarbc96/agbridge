@@ -64,15 +64,36 @@ archives:
 
 dockers:
   - image_templates:
-      - "ghcr.io/oscarbc96/agbridge:{{ .Tag }}"
+      - "ghcr.io/oscarbc96/agbridge:{{ .Tag }}-amd64"
+    use: buildx
     dockerfile: Dockerfile
     build_flag_templates:
       - "--pull"
+      - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.name={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - image_templates:
+      - "ghcr.io/oscarbc96/agbridge:{{ .Tag }}-arm64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/oscarbc96/agbridge:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/oscarbc96/agbridge:{{ .Tag }}-amd64"
+      - "ghcr.io/oscarbc96/agbridge:{{ .Tag }}-arm64"
 
 # signs our docker image
 docker_signs:
