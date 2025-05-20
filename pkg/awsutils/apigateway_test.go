@@ -28,6 +28,16 @@ func (suite *APIGatewayTestSuite) TestDescribeAPIGateway() {
 	suite.Equal(*suite.ApiGateway.RootResourceId, *apigws[0].Id, "expected API Gateway ID")
 }
 
+func (suite *APIGatewayTestSuite) TestDescribeAPIGateway_InvalidID() {
+	_, err := DescribeAPIGateway(*suite.Config, "nonexistent-id")
+	suite.Require().Error(err, "expected error with invalid API Gateway ID")
+}
+
+func (suite *APIGatewayTestSuite) TestDescribeAPIGateway_EmptyID() {
+	_, err := DescribeAPIGateway(*suite.Config, "")
+	suite.Require().Error(err, "expected error with empty API Gateway ID")
+}
+
 func TestAPIGatewayTestSuite(t *testing.T) {
 	suite.Run(t, new(APIGatewayTestSuite))
 }

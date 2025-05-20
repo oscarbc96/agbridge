@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"net"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -34,7 +35,11 @@ func CreateLocalStackContainer(ctx context.Context) (*aws.Config, *localstack.Lo
 		return nil, nil, err
 	}
 
-	awsCfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-1"))
+	awsCfg, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion("eu-west-1"),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
+	)
 	if err != nil {
 		return nil, nil, err
 	}
