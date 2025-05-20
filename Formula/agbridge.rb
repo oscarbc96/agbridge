@@ -5,20 +5,20 @@
 class Agbridge < Formula
   desc "agbridge CLI for forwarding requests to private API gateways in AWS."
   homepage "https://github.com/oscarbc96/agbridge"
-  version "0.0.6"
+  version "0.0.7"
 
   on_macos do
-    on_intel do
-      url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.6/agbridge_Darwin_x86_64.tar.gz"
-      sha256 "4687f555585728782ebb023ed84d032f5b7e1ad9403242e0b4c2df039b7929eb"
+    if Hardware::CPU.intel?
+      url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.7/agbridge_Darwin_x86_64.tar.gz"
+      sha256 "d989202e387ca1acd2f239043fd8906c352d5231196b99eced03e29266292764"
 
       def install
         bin.install "agbridge"
       end
     end
-    on_arm do
-      url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.6/agbridge_Darwin_arm64.tar.gz"
-      sha256 "b303223f24dc794c3fe91b8a783d53b793c93059d0cedbb7ef7d86c5f3adb8d7"
+    if Hardware::CPU.arm?
+      url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.7/agbridge_Darwin_arm64.tar.gz"
+      sha256 "6ea7d98022aa71cdcaa047d8e1ac9d3fcc90be05fd8bd9c64b099f8805582062"
 
       def install
         bin.install "agbridge"
@@ -27,24 +27,18 @@ class Agbridge < Formula
   end
 
   on_linux do
-    on_intel do
-      if Hardware::CPU.is_64_bit?
-        url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.6/agbridge_Linux_x86_64.tar.gz"
-        sha256 "40f878840e43f6e386616dc6a5a2d36251fdf0db771ce2ee3fd079480ea6f305"
-
-        def install
-          bin.install "agbridge"
-        end
+    if Hardware::CPU.intel? and Hardware::CPU.is_64_bit?
+      url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.7/agbridge_Linux_x86_64.tar.gz"
+      sha256 "6a01164f91a9abc86965ce03d117d353e0cf1bc1ded798518e7bdd1010932581"
+      def install
+        bin.install "agbridge"
       end
     end
-    on_arm do
-      if Hardware::CPU.is_64_bit?
-        url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.6/agbridge_Linux_arm64.tar.gz"
-        sha256 "052ab5e0b89ee452e996defce7eed10e0799465b7d512516df0e7709e21eee67"
-
-        def install
-          bin.install "agbridge"
-        end
+    if Hardware::CPU.arm? and Hardware::CPU.is_64_bit?
+      url "https://github.com/oscarbc96/agbridge/releases/download/v0.0.7/agbridge_Linux_arm64.tar.gz"
+      sha256 "56c3170faddb4d8c16995a93687fd0ca053c071b29e35f3b13e717c0df5f1710"
+      def install
+        bin.install "agbridge"
       end
     end
   end
