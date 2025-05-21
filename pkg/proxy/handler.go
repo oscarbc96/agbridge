@@ -26,11 +26,11 @@ type Handler struct {
 func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping map[*regexp.Regexp]Handler) {
 	start := time.Now()
 
-	pathWithoutQuery := getURLWithoutQuery(r.URL)
+	path := getPath(r.URL)
 
 	var handler *Handler
 	for pattern, h := range handlerMapping {
-		if pattern.MatchString(pathWithoutQuery) {
+		if pattern.MatchString(path) {
 			handler = &h
 			break
 		}
@@ -109,7 +109,7 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 	)
 }
 
-func getURLWithoutQuery(u *url.URL) string {
+func getPath(u *url.URL) string {
 	uCopy := *u
 	uCopy.RawQuery = ""
 	return strings.TrimRight(uCopy.String(), "/")
