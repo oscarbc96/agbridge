@@ -3,13 +3,14 @@ package proxy
 import (
 	"context"
 	"net/http"
+	"regexp"
 )
 
 type Proxy struct {
 	server *http.Server
 }
 
-func NewProxy(listenAddress string, handlerMapping map[string]Handler) *Proxy {
+func NewProxy(listenAddress string, handlerMapping map[*regexp.Regexp]Handler) *Proxy {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		defaultHandleRequest(w, r, handlerMapping)
 	}
