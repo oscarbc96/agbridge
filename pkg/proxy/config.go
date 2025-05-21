@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/oscarbc96/agbridge/pkg/awsutils"
@@ -21,11 +22,19 @@ type Config struct {
 	Gateways []GatewayConfig `yaml:"gateways"`
 }
 
-func (c *Config) Validate() (map[string]Handler, error) {
+func convertPathToRegex(path string) (*regexp.Regexp, error) {
+	// Replace `{param}` with `[^/]+`
+	re := regexp.MustCompile(`\{[^/]+\}`)
+	pattern := "^" + re.ReplaceAllString(path, `[^/]+`) + "$"
+	return regexp.Compile(pattern)
+}
+
+func (c *Config) Validate() (map[*regexp.Regexp]Handler, error) {
 	var (
 		awsCfg *aws.Config
 		err    error
-		result = make(map[string]Handler)
+		result = make(map[*regexp.Regexp]Handler)
+		seen   = make(map[string]struct{})
 	)
 
 	for _, gw := range c.Gateways {
@@ -40,17 +49,28 @@ func (c *Config) Validate() (map[string]Handler, error) {
 		}
 
 		for _, resource := range resources {
-			if _, exists := result[*resource.Path]; exists {
-				return nil, fmt.Errorf("duplicate path %s found in the configuration for Rest API ID %s", *resource.Path, gw.RestAPIID)
+			if resource.ResourceMethods == nil {
+				continue
 			}
 
-			if resource.ResourceMethods != nil {
-				result[*resource.Path] = Handler{
-					ResourceID: *resource.Id,
-					RestAPIID:  gw.RestAPIID,
-					Methods:    lo.Keys(resource.ResourceMethods),
-					Config:     *awsCfg,
-				}
+			path := *resource.Path
+
+			if _, ok := seen[path]; ok {
+				return nil, fmt.Errorf("duplicate path %s found in the configuration for Rest API ID %s", path, gw.RestAPIID)
+			}
+			seen[path] = struct{}{}
+
+			regexPattern, err := convertPathToRegex(path)
+			if err != nil {
+				return nil, fmt.Errorf("invalid path %s: %w", path, err)
+			}
+
+			result[regexPattern] = Handler{
+				Path:       path,
+				ResourceID: *resource.Id,
+				RestAPIID:  gw.RestAPIID,
+				Methods:    lo.Keys(resource.ResourceMethods),
+				Config:     *awsCfg,
 			}
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
@@ -15,18 +16,27 @@ import (
 )
 
 type Handler struct {
+	Path       string
 	ResourceID string
 	RestAPIID  string
 	Methods    []string
 	Config     aws.Config
 }
 
-func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping map[string]Handler) {
+func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping map[*regexp.Regexp]Handler) {
 	start := time.Now()
 
-	pathWithoutQuery := getURLWithoutQuery(r.URL)
-	handler, ok := handlerMapping[pathWithoutQuery]
-	if !ok {
+	path := getPath(r.URL)
+
+	var handler *Handler
+	for pattern, h := range handlerMapping {
+		if pattern.MatchString(path) {
+			handler = &h
+			break
+		}
+	}
+
+	if handler == nil {
 		handleError(w, r, nil, "Handler not found")
 		return
 	}
@@ -99,7 +109,7 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 	)
 }
 
-func getURLWithoutQuery(u *url.URL) string {
+func getPath(u *url.URL) string {
 	uCopy := *u
 	uCopy.RawQuery = ""
 	return strings.TrimRight(uCopy.String(), "/")
