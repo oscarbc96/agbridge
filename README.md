@@ -17,6 +17,7 @@ Designed for testing, debugging, and automation, agbridge supports working with 
 - ⚙️ Flexible configuration, either through CLI flags or a YAML config file.
 - 🌐 Supports multiple API Gateway definitions in a single run.
 - 🐳 Docker-ready, perfect for ephemeral or automated environments.
+- 🔄 Dynamic URL pattern matching like `/blogs/{slug}/comment/{id}`
 
 Whether you’re building microservices, automating tests, or debugging internal APIs, agbridge gives you a safe and developer-friendly way to reach your private AWS resources.
 
@@ -59,7 +60,7 @@ gateways:
     region: eu-west-1
 
   - rest_api_id: 789ghi0xyz
-    profile_name: myawsprofile
+    profile_name: my-aws-profile
     region: eu-east-1
 ```
 
