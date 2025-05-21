@@ -39,7 +39,7 @@ func loadProxyConfig(fs afero.Fs, flags *Flags) (*proxy.Config, error) {
 func main() {
 	fs := afero.NewOsFs()
 
-	flags, err := parseFlags(fs, os.Args)
+	flags, err := parseFlags(fs, os.Args[1:])
 	// Setup logging, before raising errors during flags parsing
 	log.Setup(flags.LogLevel)
 	if err != nil {
