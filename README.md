@@ -18,6 +18,7 @@ Designed for testing, debugging, and automation, agbridge supports working with 
 - 🌐 Supports multiple API Gateway definitions in a single run.
 - 🐳 Docker-ready, perfect for ephemeral or automated environments.
 - 🔄 Dynamic URL pattern matching like `/blogs/{slug}/comment/{id}`
+- 🎯 Optional support for selecting custom API Gateway stages using `--stage-name`
 
 Whether you’re building microservices, automating tests, or debugging internal APIs, agbridge gives you a safe and developer-friendly way to reach your private AWS resources.
 
@@ -29,15 +30,16 @@ agbridge [flags]
 
 ### Flags
 
-| Flag               | Description                                                                                                                | Default |
-|--------------------|----------------------------------------------------------------------------------------------------------------------------|---------|
-| `--version`        | Displays the application version and exits.                                                                                |         |
-| `--config`         | Path to a configuration file for AGBridge. This flag cannot be used with `--profile-name`, `--rest-api-id`, or `--region`. |         |
-| `--profile-name`   | Specifies the AWS profile name to access resources. Requires `--rest-api-id` and `--region` to be specified.               |         |
-| `--rest-api-id`    | Specifies the Rest API ID of the AWS API gateway. Required if `--config` is not provided.                                  |         |
-| `--region`         | Specifies the AWS region for the API gateway. Requires `--rest-api-id` and `--profile-name`.                               |         |
-| `--log-level`      | Sets the logging level for output messages. Options: `debug`, `info`, `warn`, `error`, `fatal`.                            | `info`  |
-| `--listen-address` | Address where AGBridge will listen for incoming requests. Format should be `host:port`.                                    | `:8080` |
+| Flag               | Description                                                                                                                       | Default |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|:-------:|
+| `--version`        | Displays the application version and exits.                                                                                       |         |
+| `--config`         | Specifies the path to a configuration file (cannot be used with `--profile-name`, `--rest-api-id`, `--region` or `--stage-name`). |         |
+| `--profile-name`   | Specifies the profile name (requires `--rest-api-id` and `--region` to be specified).                                             |         |
+| `--rest-api-id`    | Specifies the Rest API ID (required if `--config` is not provided).                                                               |         |
+| `--region`         | Specifies the AWS region to use with `--profile-name` and `--rest-api-id`.                                                        |         |
+| `--stage-name`     | Specifies the stage name to use with `--profile-name` and `--rest-api-id` and `--region`.                                         |         |
+| `--log-level`      | Sets the log verbosity level. Options: `debug`, `info`, `warn`, `error`, `fatal`.                                                 | `info`  |
+| `--listen-address` | Address where the proxy server will listen for incoming requests.                                                                 | `:8080` |
 
 ### 🧪 Examples
 
@@ -62,6 +64,7 @@ gateways:
   - rest_api_id: 789ghi0xyz
     profile_name: my-aws-profile
     region: eu-east-1
+    stage_name: prod
 ```
 
 #### Change Listen Address

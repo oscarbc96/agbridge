@@ -36,7 +36,7 @@ func parseFlags(fs afero.Fs, args []string) (*Flags, error) {
 	profileName := fset.String("profile-name", "", "Specifies the profile name (requires --rest-api-id and --region to be specified).")
 	restAPIID := fset.String("rest-api-id", "", "Specifies the Rest API ID (required if --config is not provided).")
 	region := fset.String("region", "", "Specifies the AWS region to use with --profile-name and --rest-api-id.")
-	stageName := fset.String("stage-name", "", "Specifies the stage variables to use with --profile-name and --rest-api-id and --region.")
+	stageName := fset.String("stage-name", "", "Specifies the stage name to use with --profile-name and --rest-api-id and --region.")
 	logLevelStr := fset.String("log-level", "info", "Sets the log verbosity level. Options: debug, info, warn, error, fatal.")
 	listenAddress := fset.String("listen-address", ":8080", "Address where the proxy server will listen for incoming requests.")
 
