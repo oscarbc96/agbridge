@@ -28,3 +28,17 @@ func DescribeAPIGateway(config aws.Config, apiID string) ([]types.Resource, erro
 
 	return result, nil
 }
+
+func DescribeStage(config aws.Config, apiID, stageName string) (*apigateway.GetStageOutput, error) {
+	client := apigateway.NewFromConfig(config)
+
+	stageOutput, err := client.GetStage(context.TODO(), &apigateway.GetStageInput{
+		RestApiId: aws.String(apiID),
+		StageName: aws.String(stageName),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stage: %w", err)
+	}
+
+	return stageOutput, nil
+}

@@ -16,11 +16,13 @@ import (
 )
 
 type Handler struct {
-	Path       string
-	ResourceID string
-	RestAPIID  string
-	Methods    []string
-	Config     aws.Config
+	StagePath      string
+	Path           string
+	ResourceID     string
+	RestAPIID      string
+	Methods        []string
+	Config         aws.Config
+	StageVariables map[string]string
 }
 
 func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping map[*regexp.Regexp]Handler) {
@@ -52,11 +54,20 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 		return
 	}
 
-	log.Debug("Sending request to API Gateway",
-		log.String("url", r.URL.String()),
-		log.String("method", r.Method),
-		log.Any("headers", r.Header),
-		log.String("body", string(body)),
+	pathWithQuery := handler.Path
+	if rawQuery := r.URL.RawQuery; rawQuery != "" {
+		pathWithQuery += "?" + rawQuery
+	}
+
+	log.Debug("Sending request to API Gateway" +
+		"\nProxy URL: " + r.URL.String() +
+		"\nResource ID: " + handler.ResourceID +
+		"\nREST API ID: " + handler.RestAPIID +
+		"\nMethod: " + r.Method +
+		"\nURL: " + pathWithQuery +
+		"\nBody: " + string(body) +
+		"\nHeaders: " + fmt.Sprint(r.Header) +
+		"\nStage Variables: " + fmt.Sprint(handler.StageVariables),
 	)
 
 	client := apigateway.NewFromConfig(handler.Config)
@@ -66,9 +77,10 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 			ResourceId:          &handler.ResourceID,
 			RestApiId:           &handler.RestAPIID,
 			HttpMethod:          &r.Method,
-			PathWithQueryString: aws.String(r.URL.String()),
+			PathWithQueryString: aws.String(pathWithQuery),
 			Body:                aws.String(string(body)),
 			MultiValueHeaders:   r.Header,
+			StageVariables:      handler.StageVariables,
 		},
 	)
 	if err != nil {
@@ -76,17 +88,9 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 		return
 	}
 
-	log.Debug("Received response from API Gateway",
-		log.Int("status_code", int(resp.Status)),
-		log.Any("headers", resp.Headers),
-		log.Any("multi_value_headers", resp.MultiValueHeaders),
-		log.String("body", aws.ToString(resp.Body)),
-	)
+	log.Debug("Received response from API Gateway:\n" + *resp.Log)
 
 	// Copy the headers from test-invoke response to the proxy response
-	//for key, value := range resp.Headers {
-	//	w.Header().Set(key, value)
-	//}
 	for key, values := range resp.MultiValueHeaders {
 		for _, value := range values {
 			w.Header().Add(key, value)
