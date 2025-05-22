@@ -99,7 +99,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Config and RestAPIID",
 			args:   []string{"--config", "config.yaml", "--rest-api-id", "12345"},
-			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, `--region`, or `--stage-name`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
 				RestAPIID:     "12345",
@@ -110,7 +110,7 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Config and ProfileName",
 			args:   []string{"--config", "config.yaml", "--profile-name", "testprofile"},
-			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, `--region`, or `--stage-name`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
 				ProfileName:   "testprofile",
@@ -121,10 +121,21 @@ func TestParseFlags(t *testing.T) {
 		{
 			name:   "Config and Region",
 			args:   []string{"--config", "config.yaml", "--region", "eu-west-1"},
-			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, or `--region`",
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, `--region`, or `--stage-name`",
 			expOpts: &Flags{
 				Config:        "config.yaml",
 				Region:        "eu-west-1",
+				ListenAddress: ":8080",
+				LogLevel:      log.LevelInfo,
+			},
+		},
+		{
+			name:   "Config and StageName",
+			args:   []string{"--config", "config.yaml", "--stage-name", "test"},
+			expErr: "`--config` cannot be combined with `--profile-name`, `--rest-api-id`, `--region`, or `--stage-name`",
+			expOpts: &Flags{
+				Config:        "config.yaml",
+				StageName:     "test",
 				ListenAddress: ":8080",
 				LogLevel:      log.LevelInfo,
 			},

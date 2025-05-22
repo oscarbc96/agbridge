@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"fmt"
 	"os"
 	"regexp"
 
@@ -12,23 +11,25 @@ import (
 func PrintMappings(handlerMapping map[*regexp.Regexp]Handler) error {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Path", "Methods", "Rest API ID", "Resource ID", "Account ID", "Region", "Identity"})
+	t.AppendHeader(table.Row{"Path", "Methods", "Stage Variables", "Rest API ID", "Resource ID", "Account ID", "Region", "Identity"})
 	t.SetColumnConfigs([]table.ColumnConfig{
+		{Name: "Stage Variables", AutoMerge: true},
 		{Name: "Rest API ID", AutoMerge: true},
 		{Name: "Account ID", AutoMerge: true},
 		{Name: "Region", AutoMerge: true},
 		{Name: "Identity", WidthMax: 40, AutoMerge: true},
 	})
 
-	for pattern, handler := range handlerMapping {
+	for _, handler := range handlerMapping {
 		accountID, identity, err := awsutils.GetAccountDetails(handler.Config)
 		if err != nil {
 			return err
 		}
 
 		t.AppendRow(table.Row{
-			fmt.Sprintf("%s -> %s", handler.Path, pattern.String()),
+			handler.StagePath,
 			handler.Methods,
+			handler.StageVariables,
 			handler.RestAPIID,
 			handler.ResourceID,
 			accountID,

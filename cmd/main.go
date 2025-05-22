@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -24,7 +25,7 @@ var (
 func loadProxyConfig(fs afero.Fs, flags *Flags) (*proxy.Config, error) {
 	if flags.RestAPIID != "" {
 		log.Info("Loading configuration from provided flags")
-		return proxy.NewConfig(flags.RestAPIID, flags.ProfileName, flags.Region), nil
+		return proxy.NewConfig(flags.RestAPIID, flags.ProfileName, flags.Region, flags.StageName), nil
 	}
 
 	log.Info("Loading configuration from config file", log.String("config", flags.Config))
@@ -40,6 +41,10 @@ func main() {
 	fs := afero.NewOsFs()
 
 	flags, err := parseFlags(fs, os.Args[1:])
+	if errors.Is(err, flag.ErrHelp) {
+		return
+	}
+
 	// Setup logging, before raising errors during flags parsing
 	log.Setup(flags.LogLevel)
 	if err != nil {
