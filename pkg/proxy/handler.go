@@ -83,23 +83,25 @@ func defaultHandleRequest(w http.ResponseWriter, r *http.Request, handlerMapping
 		log.String("body", aws.ToString(resp.Body)),
 	)
 
-	// Copy HTTP status code from test-invoke response to the proxy response
-	w.WriteHeader(int(resp.Status))
 	// Copy the headers from test-invoke response to the proxy response
-	for key, value := range resp.Headers {
-		w.Header().Set(key, value)
-	}
+	//for key, value := range resp.Headers {
+	//	w.Header().Set(key, value)
+	//}
 	for key, values := range resp.MultiValueHeaders {
 		for _, value := range values {
 			w.Header().Add(key, value)
 		}
 	}
+
 	// Copy the body from test-invoke response to the proxy response
 	_, err = io.Copy(w, strings.NewReader(*resp.Body))
 	if err != nil {
 		handleError(w, r, err, "Error copying response body")
 		return
 	}
+
+	// Copy HTTP status code from test-invoke response to the proxy response
+	w.WriteHeader(int(resp.Status))
 
 	log.Info(
 		r.URL.String(),
